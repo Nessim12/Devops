@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven'   // Nom de l'installation Maven configurée dans Jenkins
+        jdk 'JDK17'     // Nom du JDK configuré
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                // Récupération du code source depuis ton repo Git
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Compiler le projet et ignorer les tests si tu veux
+                sh 'mvn -B -DskipTests clean package'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                // Analyse SonarQube en utilisant le serveur configuré
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        mvn clean verify sonar:sonar \
+                        -Dsonar.projectKey=student-management \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONAR_TOKEN
+                    """
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                // Attendre le résultat du Quality Gate
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+    }
+}
