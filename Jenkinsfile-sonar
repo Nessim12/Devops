@@ -10,9 +10,7 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                checkout scm
-            }
+            steps { checkout scm }
         }
 
         stage('Build & Test') {
@@ -20,9 +18,7 @@ pipeline {
                 sh 'mvn clean verify'
             }
             post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
+                always { junit 'target/surefire-reports/*.xml' }
             }
         }
 
@@ -30,14 +26,13 @@ pipeline {
             steps {
                 // Récupère le token depuis Jenkins Credentials (ID: sonarqube-token)
                 withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
-                    // Injecte les variables SONAR_HOST_URL etc. depuis la config SonarQube dans Jenkins
+                    // Utilise la config Sonar définie dans Manage Jenkins (Name: SonarQube)
                     withSonarQubeEnv('SonarQube') {
-                        // Utiliser des quotes simples triples pour éviter l'interpolation Groovy
                         sh '''
-                            mvn -B clean verify sonar:sonar \
-                              -Dsonar.projectKey=student-management \
-                              -Dsonar.host.url=$SONAR_HOST_URL \
-                              -Dsonar.login=$SONAR_TOKEN
+                          mvn -B clean verify sonar:sonar \
+                            -Dsonar.projectKey=student-management \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_TOKEN
                         '''
                     }
                 }
@@ -47,7 +42,6 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 timeout(time: 2, unit: 'MINUTES') {
-                    // abortPipeline:true si tu veux que l'échec du QG fasse échouer la pipeline
                     waitForQualityGate abortPipeline: true
                 }
             }
