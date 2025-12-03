@@ -22,21 +22,20 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-    steps {
-        withCredentials([string(credentialsId: 'sonarqube-token-new', variable: 'SONAR_TOKEN')]) {
-            withSonarQubeEnv('SonarQube') {
-                sh """
-                  mvn clean verify sonar:sonar \
-                    -Dsonar.projectKey=student-management \
-                    -Dsonar.host.url=$SONAR_HOST_URL \
-                    -Dsonar.login=$SONAR_TOKEN
-                """
+stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'jenkins-token', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                          mvn sonar:sonar \
+                            -Dsonar.projectKey=student-management \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_TOKEN
+                        """
+                    }
+                }
             }
         }
-    }
-}
-
 
         stage('Quality Gate') {
             steps {
