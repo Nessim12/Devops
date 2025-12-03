@@ -23,15 +23,18 @@ pipeline {
         }
 
 stage('SonarQube Analysis') {
-    withCredentials([string(credentialsId: 'jenkins-token', variable: 'SONAR_TOKEN')]) {
-        sh '''
-            mvn sonar:sonar \
-            -Dsonar.projectKey=student-management \
-            -Dsonar.host.url=http://localhost:9000 \
-            -Dsonar.login=$SONAR_TOKEN
-        '''
+    steps {
+        withCredentials([string(credentialsId: 'jenkins-token', variable: 'SONAR_TOKEN')]) {
+            sh '''
+                mvn sonar:sonar \
+                -Dsonar.projectKey=student-management \
+                -Dsonar.host.url=http://localhost:9000 \
+                -Dsonar.login=$SONAR_TOKEN
+            '''
+        }
     }
 }
+
 
 
         stage('Quality Gate') {
