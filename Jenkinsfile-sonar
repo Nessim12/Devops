@@ -25,7 +25,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 // Récupère le token depuis Jenkins Credentials (ID: sonarqube-token)
-                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                withCredentials([string(credentialsId: 'sonarqube-token-new', variable: 'SONAR_TOKEN')]) {
                     // Utilise la config Sonar définie dans Manage Jenkins (Name: SonarQube)
                     withSonarQubeEnv('SonarQube') {
                         sh '''
