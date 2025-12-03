@@ -23,21 +23,20 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                // Récupère le token depuis Jenkins Credentials (ID: sonarqube-token-new)
-                withCredentials([string(credentialsId: 'sonarqube-token-new', variable: 'SONAR_TOKEN')]) {
-                    // Utilise la config Sonar définie dans Manage Jenkins (Name: SonarQube)
-                    withSonarQubeEnv('SonarQube') {
-                        sh '''
-                          mvn -B clean verify sonar:sonar \
-                            -Dsonar.projectKey=student-management \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONAR_TOKEN
-                        '''
-                    }
-                }
+    steps {
+        withCredentials([string(credentialsId: 'sonarqube-token-new', variable: 'SONAR_TOKEN')]) {
+            withSonarQubeEnv('SonarQube') {
+                sh """
+                  mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=student-management \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_TOKEN
+                """
             }
         }
+    }
+}
+
 
         stage('Quality Gate') {
             steps {
