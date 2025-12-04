@@ -45,6 +45,19 @@ stage('SonarQube Analysis') {
             }
         }
     }
+stage('Wait for SonarQube') {
+    steps {
+        script {
+            timeout(time: 2, unit: 'MINUTES') {
+                waitUntil {
+                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:9000", returnStdout: true).trim()
+                    return response == '200'
+                }
+            }
+        }
+    }
+}
+
 
     post {
         success { echo 'Pipeline réussi ✅' }
