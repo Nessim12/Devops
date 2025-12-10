@@ -13,8 +13,8 @@ metadata:
   namespace: devops
 type: Opaque
 data:
-  SPRING_DATASOURCE_USERNAME: cm9vdA==
-  SPRING_DATASOURCE_PASSWORD: cm9vdHBhc3N3b3Jk
+  SPRING_DATASOURCE_USERNAME: cm9vdA==          # "root"
+  SPRING_DATASOURCE_PASSWORD: cm9vdHBhc3N3b3Jk  # "rootpassword"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: springboot
-          image: nessim04194/devops1:FIXME   # sera remplacé par le pipeline
+          image: nessim04194/devops1:FIXME   # remplacé par le pipeline
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -53,6 +53,10 @@ spec:
                 secretKeyRef:
                   name: spring-db-secret
                   key: SPRING_DATASOURCE_PASSWORD
+            - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+              value: com.mysql.cj.jdbc.Driver
+            - name: SPRING_JPA_DATABASE_PLATFORM
+              value: org.hibernate.dialect.MySQL8Dialect
 ---
 apiVersion: v1
 kind: Service
@@ -66,5 +70,5 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-      nodePort: 30080   # <- remplace 30007 ou supprime cette ligne pour auto-assign
+      nodePort: 30080   # tu peux laisser Kubernetes choisir en supprimant cette ligne
   type: NodePort
