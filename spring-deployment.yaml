@@ -1,0 +1,75 @@
+# ConfigMap + Secret reference + Spring Boot Deployment + Service (NodePort)
+# Usage: kubectl apply -f spring-deployment.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-config
+data:
+  # set the JDBC URL to use the mysql service in the cluster
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql-service:3306/testdb
+---
+# This Secret references the same credentials used by MySQL
+# NOTE: the secret must exist (we created it inside mysql-deployment.yaml).
+# If you prefer, you can duplicate values here (base64) or keep this file as-is.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: spring-db-secret
+type: Opaque
+data:
+  # you can reuse the same base64 values as in mysql-secret
+  SPRING_DATASOURCE_USERNAME: cm9vdA==          # "root"
+  SPRING_DATASOURCE_PASSWORD: cm9vdHBhc3N3b3Jk  # "rootpassword"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot
+  template:
+    metadata:
+      labels:
+        app: springboot
+    spec:
+      containers:
+        - name: springboot
+          # <-- Use the exact image/tag you pushed to Docker Hub
+          image: nessim04194/devops1:v10
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: spring-config
+                  key: SPRING_DATASOURCE_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: spring-db-secret
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: spring-db-secret
+                  key: SPRING_DATASOURCE_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springboot-service
+spec:
+  selector:
+    app: springboot
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30007
+  type: NodePort
