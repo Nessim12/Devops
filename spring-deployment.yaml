@@ -1,31 +1,26 @@
-# ConfigMap + Secret reference + Spring Boot Deployment + Service (NodePort)
-# Usage: kubectl apply -f spring-deployment.yaml
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: spring-config
+  namespace: devops
 data:
-  # set the JDBC URL to use the mysql service in the cluster
   SPRING_DATASOURCE_URL: jdbc:mysql://mysql-service:3306/testdb
 ---
-# This Secret references the same credentials used by MySQL
-# NOTE: the secret must exist (we created it inside mysql-deployment.yaml).
-# If you prefer, you can duplicate values here (base64) or keep this file as-is.
 apiVersion: v1
 kind: Secret
 metadata:
   name: spring-db-secret
+  namespace: devops
 type: Opaque
 data:
-  # you can reuse the same base64 values as in mysql-secret
-  SPRING_DATASOURCE_USERNAME: cm9vdA==          # "root"
-  SPRING_DATASOURCE_PASSWORD: cm9vdHBhc3N3b3Jk  # "rootpassword"
+  SPRING_DATASOURCE_USERNAME: cm9vdA==
+  SPRING_DATASOURCE_PASSWORD: cm9vdHBhc3N3b3Jk
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: springboot-deployment
+  namespace: devops
 spec:
   replicas: 1
   selector:
@@ -38,8 +33,7 @@ spec:
     spec:
       containers:
         - name: springboot
-          # <-- Use the exact image/tag you pushed to Docker Hub
-          image: nessim04194/devops1:v10
+          image: nessim04194/devops1:FIXME   # sera remplacé par le pipeline
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -64,6 +58,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: springboot-service
+  namespace: devops
 spec:
   selector:
     app: springboot
