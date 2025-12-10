@@ -29,10 +29,8 @@ metadata:
   namespace: devops
 type: Opaque
 data:
-  MYSQL_ROOT_PASSWORD: cm9vdHBhc3N3b3Jk
-  MYSQL_DATABASE: dGVzdGRi
-  MYSQL_USER: cm9vdA==
-  MYSQL_PASSWORD: cm9vdHBhc3N3b3Jk
+  MYSQL_ROOT_PASSWORD: cm9vdHBhc3N3b3Jk   # "rootpassword"
+  MYSQL_DATABASE: dGVzdGRi               # "testdb"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -64,16 +62,6 @@ spec:
                 secretKeyRef:
                   name: mysql-secret
                   key: MYSQL_DATABASE
-            - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: MYSQL_USER
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-secret
-                  key: MYSQL_PASSWORD
           ports:
             - containerPort: 3306
           volumeMounts:
