@@ -66,5 +66,5 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-      nodePort: 30007
+      nodePort: 30080   # <- remplace 30007 ou supprime cette ligne pour auto-assign
   type: NodePort
