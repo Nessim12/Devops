@@ -34,7 +34,7 @@ spec:
       containers:
         - name: springboot
           image: nessim04194/devops1:FIXME   # remplacé par le pipeline
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
