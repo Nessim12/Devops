@@ -57,6 +57,8 @@ spec:
               value: com.mysql.cj.jdbc.Driver
             - name: SPRING_JPA_DATABASE_PLATFORM
               value: org.hibernate.dialect.MySQL8Dialect
+            - name: SERVER_PORT
+              value: "8089"
 ---
 apiVersion: v1
 kind: Service
