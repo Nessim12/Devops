@@ -14,6 +14,11 @@ import java.util.List;
 public class DepartmentController {
     private IDepartmentService departmentService;
 
+    @GetMapping("/test")
+    public String test() {
+        return "Department controller is working!";
+    }
+
     @GetMapping("/getAllDepartment")
     public List<Department> getAllDepartment() { return departmentService.getAllDepartments(); }
 
