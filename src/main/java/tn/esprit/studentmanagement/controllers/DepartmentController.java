@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/Department")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 @AllArgsConstructor
 public class DepartmentController {
     private IDepartmentService departmentService;
