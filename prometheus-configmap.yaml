@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: devops
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      # Prometheus lui-même
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      # Spring Boot Application (via Actuator)
+      - job_name: 'springboot-actuator'
+        metrics_path: '/student/actuator/prometheus'
+        static_configs:
+          - targets: ['springboot-service:8080']
+            labels:
+              application: 'student-management'
+              environment: 'devops'
+
+      # Jenkins (si accessible depuis le cluster)
+      - job_name: 'jenkins'
+        metrics_path: '/prometheus'
+        static_configs:
+          - targets: ['jenkins-service:8080']  # À ajuster selon votre configuration Jenkins
+            labels:
+              application: 'jenkins'
+              environment: 'devops'
+
+      # Node Exporter pour les métriques Ubuntu/Node
+      - job_name: 'node-exporter'
+        static_configs:
+          - targets: ['node-exporter:9100']
+            labels:
+              application: 'node-exporter'
+              environment: 'devops'
+

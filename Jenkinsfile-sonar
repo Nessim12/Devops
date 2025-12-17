@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+
+    tools { maven 'Maven3' }
+
+    environment {
+        MAVEN_HOME = "${tool 'Maven3'}"
+        PATH = "${env.MAVEN_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'mvn clean verify'
+            }
+            post {
+                always { junit 'target/surefire-reports/*.xml' }
+            }
+        }
+
+stage('SonarQube Analysis') {
+    steps {
+        withCredentials([string(credentialsId: 'jenkins-token', variable: 'SONAR_TOKEN')]) {
+            sh '''
+                mvn sonar:sonar \
+                -Dsonar.projectKey=student-management \
+                -Dsonar.host.url=http://localhost:9000 \
+                -Dsonar.token=$SONAR_TOKEN
+            '''
+        }
+    }
+}
+
+
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+    }
+stage('Wait for SonarQube') {
+    steps {
+        script {
+            timeout(time: 2, unit: 'MINUTES') {
+                waitUntil {
+                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://localhost:9000", returnStdout: true).trim()
+                    return response == '200'
+                }
+            }
+        }
+    }
+}
+
+
+    post {
+        success { echo 'Pipeline réussi ✅' }
+        failure { echo 'Pipeline échoué ❌' }
+    }
+}

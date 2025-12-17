@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Department API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .btn-get {
+            background-color: #2196F3;
+        }
+        .btn-get:hover {
+            background-color: #0b7dda;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Department API</h1>
+        
+        <div class="form-group">
+            <label>API URL:</label>
+            <input type="text" id="apiUrl" value="http://127.0.0.1:43937/student/Department" />
+        </div>
+
+        <h2>Create Department</h2>
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" value="Mathematics" />
+        </div>
+        <div class="form-group">
+            <label for="location">Location:</label>
+            <input type="text" id="location" value="Building B" />
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" value="234-567-8901" />
+        </div>
+        <div class="form-group">
+            <label for="head">Head:</label>
+            <input type="text" id="head" value="Dr. Johnson" />
+        </div>
+        
+        <button onclick="createDepartment()">Create Department (POST)</button>
+        <button class="btn-get" onclick="getAllDepartments()">Get All Departments (GET)</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function createDepartment() {
+            const apiUrl = document.getElementById('apiUrl').value;
+            const name = document.getElementById('name').value;
+            const location = document.getElementById('location').value;
+            const phone = document.getElementById('phone').value;
+            const head = document.getElementById('head').value;
+            
+            const department = {
+                name: name,
+                location: location,
+                phone: phone,
+                head: head
+            };
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Envoi de la requête...';
+            resultDiv.className = '';
+            
+            try {
+                const response = await fetch(`${apiUrl}/createDepartment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(department)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.textContent = '✅ Succès!\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'success';
+                } else {
+                    resultDiv.textContent = '❌ Erreur ' + response.status + ':\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'error';
+                }
+            } catch (error) {
+                resultDiv.textContent = '❌ Erreur: ' + error.message;
+                resultDiv.className = 'error';
+            }
+        }
+        
+        async function getAllDepartments() {
+            const apiUrl = document.getElementById('apiUrl').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Chargement...';
+            resultDiv.className = '';
+            
+            try {
+                const response = await fetch(`${apiUrl}/getAllDepartment`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.textContent = '✅ Succès!\n\n' + JSON.stringify(data, null, 2);
+                    resultDiv.className = 'success';
+                } else {
+                    resultDiv.textContent = '❌ Erreur ' + response.status;
+                    resultDiv.className = 'error';
+                }
+            } catch (error) {
+                resultDiv.textContent = '❌ Erreur: ' + error.message;
+                resultDiv.className = 'error';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
